@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errorHandler } = require('./middlewares/errorHandler');
 const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -14,11 +15,14 @@ mongoose.connect('mongodb://0.0.0.0:27017/bitfilmsdb');
 
 app.post('/signup', createUser);
 app.post('/signin', login);
+app.use(auth);
+app.use('/users', require('./routes/users'));
+app.use('/movies', require('./routes/movies'));
 
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-console
+  /* eslint-disable */
   console.clear();
   console.log('Сервер запущен...');
 });

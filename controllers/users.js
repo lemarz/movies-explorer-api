@@ -1,8 +1,48 @@
 const bcrypt = require('bcrypt');
 const Users = require('../models/user');
+const { getJwtToken } = require('../utils/jwt');
 const ErrorBadRequest = require('../errors/ErrorBadRequest');
 const ErrorUserExists = require('../errors/ErrorUserExists');
-const { getJwtToken } = require('../utils/jwt');
+const ErrorNotFound = require('../errors/ErrorNotFound');
+
+module.exports.getUserMe = (req, res, next) => {
+  const { _id } = req.user;
+  Users.findById(_id)
+    .orFail(() => {
+      throw new ErrorNotFound('Пользователь по указанному _id не найден.');
+    })
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new ErrorBadRequest('Переданы некорректные данные.'));
+      } else {
+        next(err);
+      }
+    });
+};
+
+module.exports.updateUserInfo = (req, res, next) => {
+  const { name, email } = req.body;
+  Users.findByIdAndUpdate(
+    req.user._id,
+    { name, email },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+    .orFail(() => {
+      throw new ErrorNotFound('Пользователь по указанному _id не найден.');
+    })
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new ErrorBadRequest('Переданы некорректные данные.'));
+      } else {
+        next(err);
+      }
+    });
+};
 
 module.exports.createUser = (req, res, next) => {
   const { email, name } = req.body;
@@ -22,7 +62,6 @@ module.exports.createUser = (req, res, next) => {
 };
 
 module.exports.login = (req, res, next) => {
-  console.log(req.body);
   const { email, password } = req.body;
 
   return Users.findUserByCredentials(email, password)
@@ -33,7 +72,7 @@ module.exports.login = (req, res, next) => {
         httpOnly: true,
         sameSite: true,
       });
-      res.status(200).send({ message: 'Авторизация успешна', token });
+      res.send({ message: 'Авторизация успешна', token });
     })
     .catch((err) => next(err));
 };
