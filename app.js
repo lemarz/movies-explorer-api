@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const { errorHandler } = require('./middlewares/errorHandler');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const notFound = require('./middlewares/notFound');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000 } = process.env;
@@ -20,6 +21,8 @@ app.post('/signin', login);
 app.use(auth);
 app.use('/users', require('./routes/users'));
 app.use('/movies', require('./routes/movies'));
+
+app.use(notFound);
 
 app.use(errorLogger);
 app.use(errorHandler);
