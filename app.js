@@ -6,6 +6,7 @@ const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const notFound = require('./middlewares/notFound');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { createUserValidator, loginValidator } = require('./middlewares/joiValidator');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -16,8 +17,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 mongoose.connect('mongodb://0.0.0.0:27017/bitfilmsdb');
 app.use(requestLogger);
 
-app.post('/signup', createUser);
-app.post('/signin', login);
+app.post('/signup', createUserValidator, createUser);
+app.post('/signin', loginValidator, login);
 app.use(auth);
 app.use('/users', require('./routes/users'));
 app.use('/movies', require('./routes/movies'));
