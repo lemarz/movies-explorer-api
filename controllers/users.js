@@ -4,17 +4,18 @@ const { getJwtToken } = require('../utils/jwt');
 const ErrorBadRequest = require('../errors/ErrorBadRequest');
 const ErrorUserExists = require('../errors/ErrorUserExists');
 const ErrorNotFound = require('../errors/ErrorNotFound');
+const { INVALID_DATA_ERROR_TEXT, USER_ID_NOT_FOUND_ERROR_TEXT, NOT_UNIQUE_EMAIL_ERROR_TEXT } = require('../utils/errorMessages');
 
 module.exports.getUserMe = (req, res, next) => {
   const { _id } = req.user;
   Users.findById(_id)
     .orFail(() => {
-      throw new ErrorNotFound('Пользователь по указанному _id не найден.');
+      throw new ErrorNotFound(USER_ID_NOT_FOUND_ERROR_TEXT);
     })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new ErrorBadRequest('Переданы некорректные данные.'));
+        next(new ErrorBadRequest(INVALID_DATA_ERROR_TEXT));
       } else {
         next(err);
       }
@@ -32,12 +33,12 @@ module.exports.updateUserInfo = (req, res, next) => {
     },
   )
     .orFail(() => {
-      throw new ErrorNotFound('Пользователь по указанному _id не найден.');
+      throw new ErrorNotFound(USER_ID_NOT_FOUND_ERROR_TEXT);
     })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ErrorBadRequest('Переданы некорректные данные.'));
+        next(new ErrorBadRequest(INVALID_DATA_ERROR_TEXT));
       } else {
         next(err);
       }
@@ -52,9 +53,9 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => res.send({ name: user.name, email: user.email }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ErrorBadRequest('Переданы некорректные данные.'));
+        next(new ErrorBadRequest(INVALID_DATA_ERROR_TEXT));
       } else if (err.code === 11000) {
-        next(new ErrorUserExists('Такой пользователь уже существует'));
+        next(new ErrorUserExists(NOT_UNIQUE_EMAIL_ERROR_TEXT));
       } else {
         next(err);
       }

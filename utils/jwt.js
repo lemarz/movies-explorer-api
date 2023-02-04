@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
-
-const { JWT_SECRET = 'your-secret-key' } = process.env;
+const { JWT_SECRET } = require('./config');
 
 module.exports.getJwtToken = (id) => jwt.sign(
   { _id: id },

@@ -10,6 +10,17 @@ const CORS_OPTIONS = {
   credentials: true,
 };
 
+const {
+  PORT = 3000,
+  NODE_ENV = 'development',
+  DATABASE_ADDRESS = 'mongodb://0.0.0.0:27017/bitfilmsdb',
+  JWT_SECRET = 'dev-secret-key',
+} = process.env;
+
 module.exports = {
   CORS_OPTIONS,
+  PORT,
+  NODE_ENV,
+  DATABASE_ADDRESS,
+  JWT_SECRET,
 };
