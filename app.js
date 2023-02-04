@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
+const cors = require('cors');
 const { errorHandler } = require('./middlewares/errorHandler');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
@@ -9,11 +10,13 @@ const notFound = require('./middlewares/notFound');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { createUserValidator, loginValidator } = require('./middlewares/joiValidator');
 const limiter = require('./middlewares/limiter');
+const { CORS_OPTIONS } = require('./utils/config');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
 app.use(helmet());
+app.use(cors(CORS_OPTIONS));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
