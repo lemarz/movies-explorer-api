@@ -1,21 +1,25 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const helmet = require('helmet');
 const { errorHandler } = require('./middlewares/errorHandler');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const notFound = require('./middlewares/notFound');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { createUserValidator, loginValidator } = require('./middlewares/joiValidator');
+const limiter = require('./middlewares/limiter');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://0.0.0.0:27017/bitfilmsdb');
 app.use(requestLogger);
+app.use(limiter);
 
 app.post('/signup', createUserValidator, createUser);
 app.post('/signin', loginValidator, login);
