@@ -26,19 +26,17 @@ module.exports.createMovie = (req, res, next) => {
 };
 
 module.exports.deleteMovie = (req, res, next) => {
-  const { _id } = req.params;
-  const userId = req.user._id;
-  Movies.findById(_id)
+  const movieId = req.params._id;
+  Movies.findById(movieId)
     .orFail(() => {
       throw new ErrorNotFound(MOVIE_ID_NOT_FOUND_ERROR_TEXT);
     })
     .then((movie) => {
-      if (movie.owner.toString() !== userId) {
-        return next(new ErrorForbidden(ACCESS_ERROR_TEXT));
+      if (movie.owner.toString() !== req.user._id) {
+        throw new ErrorForbidden(ACCESS_ERROR_TEXT);
       }
-      return String(movie._id);
+      return movie.remove();
     })
-    .then((id) => Movies.findByIdAndRemove(id))
     .then((removedMovie) => res.send({ message: `Фильм '${removedMovie.nameRU}' удален` }))
     .catch((err) => {
       if (err.name === 'CastError') {
