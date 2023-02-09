@@ -1,4 +1,3 @@
-//
 const UNAUTHORIZED_ERROR_TEXT = 'Необходима авторизация.';
 const INVALID_DATA_ERROR_TEXT = 'Переданы некорректные данные';
 const ACCESS_ERROR_TEXT = 'Вы не можете удалять чужие фильмы.';

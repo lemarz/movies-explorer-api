@@ -39,6 +39,8 @@ module.exports.updateUserInfo = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ErrorBadRequest(INVALID_DATA_ERROR_TEXT));
+      } else if (err.code === 11000) {
+        next(new ErrorUserExists(NOT_UNIQUE_EMAIL_ERROR_TEXT));
       } else {
         next(err);
       }
